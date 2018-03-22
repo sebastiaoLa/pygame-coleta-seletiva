@@ -97,6 +97,7 @@ class Game():
 		self.restart()
 
 	def check_hover(self,mousePos,objRect):
+		print 'checked' , (mousePos[0] >= objRect.left and mousePos[0] <= objRect.right) and (mousePos[1] >= objRect.top and mousePos[1] <= objRect.bottom)
 		return (mousePos[0] >= objRect.left and mousePos[0] <= objRect.right) and (mousePos[1] >= objRect.top and mousePos[1] <= objRect.bottom)
 
 	
@@ -131,10 +132,10 @@ class Game():
 						exit()
 				
 			if self.check_hover(mouseMotPos,self.sairObjRect):
-				sair = pygame.image.load('sair2.png')
+				self.sair = pygame.image.load('sair2.png')
 			else:
-				sair = pygame.image.load('sair1.png')
-			if self.check_hover(mouseMotPos,self.sairObjRect):
+				self.sair = pygame.image.load('sair1.png')
+			if self.check_hover(mouseClkPos,self.sairObjRect):
 					if self.jogando:
 						self.jogando = False
 					elif self.instrucoesbool:
@@ -145,28 +146,28 @@ class Game():
 						exit()
 			if self.jogando == False and self.instrucoesbool == False:
 				if self.check_hover(mouseMotPos,self.menuObjRect):
-					menu = pygame.image.load('menu2.png')
+					self.menu = pygame.image.load('menu2.png')
 				else:
-					menu = pygame.image.load('menu1.png')
+					self.menu = pygame.image.load('menu1.png')
 				
 				if self.check_hover(mouseMotPos,self.jogarObjRect):
-					jogar = pygame.image.load('jogar2.png')
+					self.jogar = pygame.image.load('jogar2.png')
 				else:
-					jogar = pygame.image.load('jogar1.png')
+					self.jogar = pygame.image.load('jogar1.png')
 				
 				if self.check_hover(mouseMotPos,self.instrucoesObjRect):
-					instrucoes = pygame.image.load('instrucoes2.png')
+					self.instrucoes = pygame.image.load('instrucoes2.png')
 				else:
-					instrucoes = pygame.image.load('instrucoes1.png')
+					self.instrucoes = pygame.image.load('instrucoes1.png')
 					
 				if self.clicked:
 					if self.check_hover(mouseClkPos,self.jogarObjRect):
-						jogando = True
+						self.jogando = True
 						soundObj = pygame.mixer.Sound('asdf.ogg')
 						soundObj.play()
 						self.zerar()
 					if self.check_hover(mouseClkPos,self.instrucoesObjRect):
-						instrucoesbool = True	
+						self.instrucoesbool = True	
 						soundObj = pygame.mixer.Sound('asdf.ogg')
 						soundObj.play()
 						self.zerar()
@@ -187,24 +188,24 @@ class Game():
 					self.jogarObjRect.center = (self.jogarx,self.jogary)
 					self.instrucoesObjRect.center = (self.instrucoesx,self.instrucoesy)
 			
-			elif instrucoesbool == True:
+			elif self.instrucoesbool == True:
 				instrucoescaixa = pygame.image.load('instrucoescaixa.png')
 				instrucoescaixaObjRect = instrucoescaixa.get_rect()
 				instrucoescaixaObjRect.center = (350,275)
 				self.DISPLAYSURF.blit(self.menu,self.menuObjRect)
 				self.DISPLAYSURF.blit(instrucoescaixa,instrucoescaixaObjRect)
 				if self.check_hover(mouseClkPos,self.menuObjRect):
-					instrucoesbool = False
+					self.instrucoesbool = False
 					soundObj = pygame.mixer.Sound('asdf.ogg')
 					soundObj.play()
 					self.zerar()
 				
 				if self.check_hover(mouseClkPos,self.menuObjRect):
-					menu = pygame.image.load('menu2.png')
+					self.menu = pygame.image.load('menu2.png')
 				else:
-					menu = pygame.image.load('menu1.png')
+					self.menu = pygame.image.load('menu1.png')
 					
-			elif jogando == True: #Eis o Real Jogo
+			elif self.jogando == True: #Eis o Real Jogo
 				
 				if self.plasticoclicked:
 					if clickagain == True:
@@ -370,7 +371,7 @@ class Game():
 					textRectObj.top = 0
 					self.DISPLAYSURF.blit(textSurfaceObj, textRectObj)
 				else:
-					sol = False
+					self.sol = False
 			if self.jogando == False and self.instrucoesbool == False:
 				self.DISPLAYSURF.blit(self.jogar,self.jogarObjRect)
 				self.DISPLAYSURF.blit(self.instrucoes,self.instrucoesObjRect)
