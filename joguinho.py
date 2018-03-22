@@ -8,6 +8,11 @@ from pygame.locals import *
 
 class Game():
 	def __init__(self, *args, **kwargs):
+		self.RED = (255,000,000)
+		self.GREEN = (000,255,000)
+		self.BLUE = (000,000,255)
+		self.WHITE = (255,255,255)
+		self.BLACK = (000,000,000)
 		self.organicolist = []
 		self.metallist = []
 		self.plasticolist = []
@@ -17,6 +22,7 @@ class Game():
 
 		self.cont = 0
 		self.sol = False
+		self.solObjRect = pygame.Rect(68,80,72,50)
 		self.nivel = 1
 		self.contsol = -1
 		self.mousex = 0
@@ -89,23 +95,31 @@ class Game():
 
 
 		self.restart()
+
+	def check_hover(self,mousePos,objRect):
+		return (mousePos[0] >= objRect.left and mousePos[0] <= objRect.right) and (mousePos[1] >= objRect.top and mousePos[1] <= objRect.bottom)
+
 	
 	def main_loop(self):
 		while True: #main game loop
 			self.DISPLAYSURF.blit(self.playing,self.playingObjRect)
 			for event in pygame.event.get():
+				mouseClkPos = (0,0)
+				mouseMotPos = (0,0)
 				if event.type == QUIT:
 					sys.exit()
 					pygame.quit()
 					exit()
 				if event.type == MOUSEBUTTONUP:
-					mousex, mousey = event.pos
+					mouseClkPos = event.pos
+					mousex,mousey = mouseClkPos
 					print mousex,mousey
 					if self.jogando and True in [self.plasticoclicked,self.metalclicked,self.papelclicked,self.organicoclicked,self.vidroclicked]:
 						clickagain = True
 				if event.type ==  MOUSEMOTION:
-					mousemox,mousemoy = event.pos
-					#print mousemox,mousemoy
+					mouseMotPos = event.pos
+					mousemox,mousemoy = mouseMotPos 
+					print mousemox,mousemoy
 				if event.type == KEYDOWN and event.key == pygame.K_ESCAPE:
 					if self.jogando:
 						self.jogando = False
@@ -116,11 +130,11 @@ class Game():
 						pygame.quit()
 						exit()
 				
-			if (mousemox >= self.sairObjRect.left and mousemox <=self.sairObjRect.right) and (mousemoy >= self.sairObjRect.top and mousemoy <= self.sairObjRect.bottom):
+			if self.check_hover(mouseMotPos,self.sairObjRect):
 				sair = pygame.image.load('sair2.png')
 			else:
 				sair = pygame.image.load('sair1.png')
-			if (mousex >= self.sairObjRect.left and mousex <= self.sairObjRect.right) and (mousey >= self.sairObjRect.top and mousey <= self.sairObjRect.bottom):
+			if self.check_hover(mouseMotPos,self.sairObjRect):
 					if self.jogando:
 						self.jogando = False
 					elif self.instrucoesbool:
@@ -130,247 +144,242 @@ class Game():
 						pygame.quit()
 						exit()
 			if self.jogando == False and self.instrucoesbool == False:
-				if (mousemox >=self. menuObjRect.left and mousemox <= self.menuObjRect.right) and (mousemoy >= self.menuObjRect.top and mousemoy <= self.menuObjRect.bottom):
+				if self.check_hover(mouseMotPos,self.menuObjRect):
 					menu = pygame.image.load('menu2.png')
 				else:
 					menu = pygame.image.load('menu1.png')
 				
-				if (mousemox >= self.jogarObjRect.left and mousemox <= self.jogarObjRect.right) and (mousemoy >= self.jogarObjRect.top and mousemoy <= self.jogarObjRect.bottom):
+				if self.check_hover(mouseMotPos,self.jogarObjRect):
 					jogar = pygame.image.load('jogar2.png')
 				else:
 					jogar = pygame.image.load('jogar1.png')
 				
-				if (mousemox >= instrucoesObjRect.left and mousemox <= instrucoesObjRect.right) and (mousemoy >= instrucoesObjRect.top and mousemoy <= instrucoesObjRect.bottom):
+				if self.check_hover(mouseMotPos,self.instrucoesObjRect):
 					instrucoes = pygame.image.load('instrucoes2.png')
 				else:
 					instrucoes = pygame.image.load('instrucoes1.png')
 					
-				if clicked:
-					if (mousex >= jogarObjRect.left and mousex <= jogarObjRect.right) and (mousey >= jogarObjRect.top and mousey <= jogarObjRect.bottom):
+				if self.clicked:
+					if self.check_hover(mouseClkPos,self.jogarObjRect):
 						jogando = True
 						soundObj = pygame.mixer.Sound('asdf.ogg')
 						soundObj.play()
-						zerar()
-					if (mousex >= instrucoesObjRect.left and mousex <= instrucoesObjRect.right) and (mousey >= instrucoesObjRect.top and mousey <= instrucoesObjRect.bottom):
+						self.zerar()
+					if self.check_hover(mouseClkPos,self.instrucoesObjRect):
 						instrucoesbool = True	
 						soundObj = pygame.mixer.Sound('asdf.ogg')
 						soundObj.play()
-						zerar()	
+						self.zerar()
 				
-				if (mousex >= menuObjRect.left and mousex <= menuObjRect.right) and (mousey >= menuObjRect.top and mousey <= menuObjRect.bottom):
-					click = True
+				if self.check_hover(mouseClkPos,self.menuObjRect):
+					self.click = True
 					soundObj = pygame.mixer.Sound('asdf.ogg')
 					soundObj.play()
-					zerar()
+					self.zerar()
 					
-				if jogary >= 90:
-					click = False
-					clicked = True 
+				if self.jogary >= 90:
+					self.click = False
+					self.clicked = True 
 				
-				if click == True:
-					jogary += 2
-					instrucoesy += 4
-					jogarObjRect.center = (jogarx,jogary)
-					instrucoesObjRect.center = (instrucoesx,instrucoesy)
+				if self.click == True:
+					self.jogary += 2
+					self.instrucoesy += 4
+					self.jogarObjRect.center = (self.jogarx,self.jogary)
+					self.instrucoesObjRect.center = (self.instrucoesx,self.instrucoesy)
 			
 			elif instrucoesbool == True:
 				instrucoescaixa = pygame.image.load('instrucoescaixa.png')
 				instrucoescaixaObjRect = instrucoescaixa.get_rect()
 				instrucoescaixaObjRect.center = (350,275)
-				DISPLAYSURF.blit(menu,menuObjRect)
-				DISPLAYSURF.blit(instrucoescaixa,instrucoescaixaObjRect)
-				if (mousex >= menuObjRect.left and mousex <= menuObjRect.right) and (mousey >= menuObjRect.top and mousey <= menuObjRect.bottom):
+				self.DISPLAYSURF.blit(self.menu,self.menuObjRect)
+				self.DISPLAYSURF.blit(instrucoescaixa,instrucoescaixaObjRect)
+				if self.check_hover(mouseClkPos,self.menuObjRect):
 					instrucoesbool = False
 					soundObj = pygame.mixer.Sound('asdf.ogg')
 					soundObj.play()
-					zerar()
+					self.zerar()
 				
-				if (mousemox >= menuObjRect.left and mousemox <= menuObjRect.right) and (mousemoy >= menuObjRect.top and mousemoy <= menuObjRect.bottom):
+				if self.check_hover(mouseClkPos,self.menuObjRect):
 					menu = pygame.image.load('menu2.png')
 				else:
 					menu = pygame.image.load('menu1.png')
 					
 			elif jogando == True: #Eis o Real Jogo
 				
-				if plasticoclicked:
+				if self.plasticoclicked:
 					if clickagain == True:
 						if (mousex >= 4 and mousex <= 43) and (mousey >= 370 and mousey <= 430):
-							acerto()
+							self.acerto()
 							plastico = False
 							plasticoclicked = False
 						else:
-							erro()
+							self.erro()
 							plastico = False
 							plasticoclicked = False
 						
-				if organicoclicked:
+				if self.organicoclicked:
 					if clickagain == True:
 						if (mousex >= 171 and mousex <= 210) and (mousey >= 370 and mousey <= 430):
 							organico = False
 							organicoclicked = False
-							acerto()
+							self.acerto()
 						else:
 							organico = False
 							organicoclicked = False
-							erro()
+							self.erro()
 							
-				if metalclicked:
+				if self.metalclicked:
 					if clickagain == True:
 						if (mousex >= 86 and mousex <= 126) and (mousey >= 370 and mousey <= 430):
 							metal = False
 							metalclicked = False
-							acerto()
+							self.acerto()
 						else:
 							metal = False
 							metalclicked = False
-							erro()
+							self.erro()
 							
-				if vidroclicked:
+				if self.vidroclicked:
 					if clickagain == True:
 						if (mousex >= 45 and mousex <= 90) and (mousey >= 370 and mousey <= 430):
 							vidro = False
 							vidroclicked = False
-							acerto()
+							self.acerto()
 						else:
 							vidro = False
 							vidroclicked = False
-							erro()
+							self.erro()
 				
-				if organicoclicked:
+				if self.organicoclicked:
 					if clickagain == True:
 						if (mousex >= 170 and mousex <= 210) and (mousey >= 370 and mousey <= 430):
 							organico = False
 							organicoclicked = False
-							acerto()
+							self.acerto()
 						else:
 							organico = False
 							organicoclicked = False
-							erro()
+							self.erro()
 							
-				if papelclicked:
+				if self.papelclicked:
 					if clickagain == True:
 						if (mousex >= 128 and mousex <= 170) and (mousey >= 370 and mousey <= 430):
 							papel = False
 							papelclicked = False
-							acerto()
+							self.acerto()
 							
 						else:
 							papel = False
 							papelclicked = False
-							erro()
+							self.erro()
 							
 				
-				if organico:
-					DISPLAYSURF.blit(organicoimg,organicoimgObjRect)
-					if (mousex >= organicolist[2] and mousex <= organicolist[3]) and (mousey >= organicolist[4] and mousey <= organicolist[5]):
+				if self.organico:
+					self.DISPLAYSURF.blit(self.organicoimg,self.organicoimgObjRect)
+					if self.check_hover(mouseClkPos,self.organicoimgObjRect):
 						organicoclicked = True
-						zerar()
+						self.zerar()
 				if plastico:
-					DISPLAYSURF.blit(plasticoimg,plasticoimgObjRect)
-					if (mousex >= plasticolist[2] and mousex <= plasticolist[3]) and (mousey >= plasticolist[4] and mousey <= plasticolist[5]):
+					self.DISPLAYSURF.blit(self.plasticoimg,self.plasticoimgObjRect)
+					if self.check_hover(mouseClkPos,self.plasticoimgObjRect):
 						plasticoclicked = True
-						zerar()
+						self.zerar()
 				if metal:
-					DISPLAYSURF.blit(metalimg,metalimgObjRect)
-					if (mousex >= metallist[2] and mousex <= metallist[3]) and (mousey >= metallist[4] and mousey <= metallist[5]):
+					self.DISPLAYSURF.blit(self.metalimg,self.metalimgObjRect)
+					if self.check_hover(mouseClkPos,self.metalimgObjRect):
 						metalclicked = True
-						zerar()
+						self.zerar()
 				if vidro:
-					DISPLAYSURF.blit(vidroimg,vidroimgObjRect)
-					if (mousex >= vidrolist[2] and mousex <= vidrolist[3]) and (mousey >= vidrolist[4] and mousey <= vidrolist[5]):
+					self.DISPLAYSURF.blit(self.vidroimg,self.vidroimgObjRect)
+					if self.check_hover(mouseClkPos,self.vidroimgObjRect):
 						vidroclicked = True
-						zerar()
+						self.zerar()
 				if papel:
-					DISPLAYSURF.blit(papelimg,papelimgObjRect)
-					if (mousex >= papellist[2] and mousex <= papellist[3]) and (mousey >= papellist[4] and mousey <= papellist[5]):
+					self.DISPLAYSURF.blit(self.papelimg,self.papelimgObjRect)
+					if self.check_hover(mouseClkPos,self.papelimgObjRect):
 						papelclicked = True
-						zerar()
+						self.zerar()
 				if organicoclicked:
-					organicoimgObjRect.center = (mousemox,mousemoy)
+					self.organicoimgObjRect.center = mouseMotPos
 				if plasticoclicked:
-					plasticoimgObjRect.center = (mousemox,mousemoy)
+					self.plasticoimgObjRect.center = mouseMotPos
 				if metalclicked:
-					metalimgObjRect.center = (mousemox,mousemoy)
+					self.metalimgObjRect.center = mouseMotPos
 				if papelclicked:
-					papelimgObjRect.center = (mousemox,mousemoy)
+					self.papelimgObjRect.center = mouseMotPos
 				if vidroclicked:
-					vidroimgObjRect.center = (mousemox,mousemoy)
+					self.vidroimgObjRect.center = mouseMotPos
 				
-				pontosObj = fontObj.render(str(ponto), True, red)
-				vidasObj = fontObj.render(str(vidas), True, red)
+				pontosObj = self.fontObj.render(str(self.ponto), True, self.BLACK)
+				vidasObj = self.fontObj.render(str(self.vidas), True, self.RED)
 				pontosObjRect = pontosObj.get_rect()
 				vidasObjRect = vidasObj.get_rect()
 				pontosObjRect.topright = (700,0)
 				vidasObjRect.topleft = (0,0)
-				DISPLAYSURF.blit(pontosObj,pontosObjRect)
-				DISPLAYSURF.blit(vidasObj,vidasObjRect)
+				self.DISPLAYSURF.blit(pontosObj,pontosObjRect)
+				self.DISPLAYSURF.blit(vidasObj,vidasObjRect)
 				
-				if ponto == 15:
-					jogando = False
-					textSurfaceObj = fontObj.render("Parabens, voce venceu", True, red)
+				if self.ponto == 15:
+					self.jogando = False
+					textSurfaceObj = self.fontObj.render("Parabens, voce venceu", True, red)
 					textRectObj = textSurfaceObj.get_rect()
 					mousex = 0
 					mousey = 0
-					restart()
-					vidaponto()
-					vidaponto()
+					self.restart()
+					self.vidaponto()
 					textRectObj.center = (350,275)
 					textRectObj.top = 0
-					DISPLAYSURF.blit(textSurfaceObj, textRectObj)
+					self.DISPLAYSURF.blit(textSurfaceObj, textRectObj)
 					pygame.display.update()
 					time.sleep(3)
 					
-				if vidas == 0:
+				if self.vidas == 0:
 					soundObj = pygame.mixer.Sound('badswap.wav')
 					soundObj.play()
-					jogando = False
-					textSurfaceObj = fontObj.render("Game Over", True, red)
+					self.jogando = False
+					textSurfaceObj = self.fontObj.render("Game Over", True, red)
 					textRectObj = textSurfaceObj.get_rect()
-					mousex = 0
-					mousey = 0
-					restart()
-					vidaponto()
+					self.restart()
+					self.vidaponto()
 					textRectObj.center = (350,275)
 					textRectObj.top = 0
-					DISPLAYSURF.blit(textSurfaceObj, textRectObj)
+					self.DISPLAYSURF.blit(textSurfaceObj, textRectObj)
 					pygame.display.update()
 					time.sleep(3)
 				
 				if organico == False and plastico == False and metal == False and vidro == False and papel == False:
 					#jogando = False
-					restart()
-					nivel += 1
-					nivelstr = "Nivel: "+str(nivel)
-					textSurfaceObj = fontObj.render(nivelstr, True, red)
+					self.restart()
+					self.nivel += 1
+					nivelstr = "Nivel: "+str(self.nivel)
+					textSurfaceObj = self.fontObj.render(nivelstr, True, self.RED)
 					textRectObj = textSurfaceObj.get_rect()
-					contsol = cont
+					contsol = self.cont
 					sol = True
 					
 				
-			if (mousex >= 68 and mousex<=140) and (mousey>=80 and mousey<= 130):
-					textSurfaceObj = fontObj.render("CUIDADO, O SOL QUEIMA!!!", True, red)
+			if self.solObjRect.collidepoint(mouseClkPos):
+					textSurfaceObj = self.fontObj.render("CUIDADO, O SOL QUEIMA!!!", True, self.RED)
 					textRectObj = textSurfaceObj.get_rect()
-					mousex = 0
-					mousey = 0
-					contsol = cont
-					sol = True
-			if sol==True:
-				if cont != contsol+3*fps:
+					self.contsol = self.cont
+					self.sol = True
+			if self.sol==True:
+				if self.cont != self.contsol+3*self.fps:
 					textRectObj = textSurfaceObj.get_rect()
 					textRectObj.center = (350,275)
 					textRectObj.top = 0
-					DISPLAYSURF.blit(textSurfaceObj, textRectObj)
+					self.DISPLAYSURF.blit(textSurfaceObj, textRectObj)
 				else:
 					sol = False
-			if jogando == False and instrucoesbool == False:
-				DISPLAYSURF.blit(jogar,jogarObjRect)
-				DISPLAYSURF.blit(instrucoes,instrucoesObjRect)
-				DISPLAYSURF.blit(menu,menuObjRect)
+			if self.jogando == False and self.instrucoesbool == False:
+				self.DISPLAYSURF.blit(self.jogar,self.jogarObjRect)
+				self.DISPLAYSURF.blit(self.instrucoes,self.instrucoesObjRect)
+				self.DISPLAYSURF.blit(self.menu,self.menuObjRect)
 			
-			DISPLAYSURF.blit(sair,sairObjRect)
+			self.DISPLAYSURF.blit(self.sair,self.sairObjRect)
 			pygame.display.update()
-			cont+= 1
-			fpsClock.tick(fps)
+			self.cont+= 1
+			self.fpsClock.tick(self.fps)
 				
 
 	def zerar(self):
@@ -398,46 +407,16 @@ class Game():
 		self.clickagain = False
 
 	def restart(self):
-		self.organicolist.insert(0,random.randint(40,600))
-		self.organicolist.insert(1,random.randint(450,500))
-		organicoimgObjRect = self.organicoimg.get_rect()
-		organicoimgObjRect.center = (self.organicolist[0],self.organicolist[1])
-		self.metallist.insert(0,random.randint(40,600))
-		self.metallist.insert(1,random.randint(450,500))
-		metalimgObjRect = self.metalimg.get_rect()
-		metalimgObjRect.center = (self.metallist[0],self.metallist[1])
-		self.vidrolist.insert(0,random.randint(40,600))
-		self.vidrolist.insert(1,random.randint(450,500))
-		vidroimgObjRect = self.vidroimg.get_rect()
-		vidroimgObjRect.center = (self.vidrolist[0],self.vidrolist[1])
-		self.plasticolist.insert(0,random.randint(40,600))
-		self.plasticolist.insert(1,random.randint(450,500))
-		plasticoimgObjRect = self.plasticoimg.get_rect()
-		plasticoimgObjRect.center = (self.plasticolist[0],self.plasticolist[1])
-		self.papellist.insert(0,random.randint(40,600))
-		self.papellist.insert(1,random.randint(450,500))
-		papelimgObjRect = self.papelimg.get_rect()
-		papelimgObjRect.center = (self.papellist[0],self.papellist[1])
-		self.organicolist.insert(2,organicoimgObjRect.left)
-		self.organicolist.insert(3,organicoimgObjRect.right)
-		self.organicolist.insert(4,organicoimgObjRect.top)
-		self.organicolist.insert(5,organicoimgObjRect.bottom)
-		self.metallist.insert(2,metalimgObjRect.left)
-		self.metallist.insert(3,metalimgObjRect.right)
-		self.metallist.insert(4,metalimgObjRect.top)
-		self.metallist.insert(5,metalimgObjRect.bottom)
-		self.vidrolist.insert(2,vidroimgObjRect.left)
-		self.vidrolist.insert(3,vidroimgObjRect.right)
-		self.vidrolist.insert(4,vidroimgObjRect.top)
-		self.vidrolist.insert(5,vidroimgObjRect.bottom)
-		self.plasticolist.insert(2,plasticoimgObjRect.left)
-		self.plasticolist.insert(3,plasticoimgObjRect.right)
-		self.plasticolist.insert(4,plasticoimgObjRect.top)
-		self.plasticolist.insert(5,plasticoimgObjRect.bottom)
-		self.papellist.insert(2,papelimgObjRect.left)
-		self.papellist.insert(3,papelimgObjRect.right)
-		self.papellist.insert(4,papelimgObjRect.top)
-		self.papellist.insert(5,papelimgObjRect.bottom)
+		self.organicoimgObjRect = self.organicoimg.get_rect()
+		self.organicoimgObjRect.center = (random.randint(40,600),random.randint(450,500))
+		self.metalimgObjRect = self.metalimg.get_rect()
+		self.metalimgObjRect.center = (random.randint(40,600),random.randint(450,500))
+		self.vidroimgObjRect = self.vidroimg.get_rect()
+		self.vidroimgObjRect.center = (random.randint(40,600),random.randint(450,500))
+		self.plasticoimgObjRect = self.plasticoimg.get_rect()
+		self.plasticoimgObjRect.center = (random.randint(40,600),random.randint(450,500))
+		self.papelimgObjRect = self.papelimg.get_rect()
+		self.papelimgObjRect.center = (random.randint(40,600),random.randint(450,500))
 		
 		
 		self.organico = True
