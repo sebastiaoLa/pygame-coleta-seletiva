@@ -3,7 +3,7 @@ import sys
 import time
 
 import pygame
-from pygame.constants import QUIT,MOUSEBUTTONUP,MOUSEMOTION,KEYDOWN,K_ESCAPE
+from pygame.locals import QUIT,MOUSEBUTTONUP,MOUSEMOTION,KEYDOWN,K_ESCAPE
 
 
 class Game():
@@ -13,11 +13,6 @@ class Game():
 		self.BLUE = (000,000,255)
 		self.WHITE = (255,255,255)
 		self.BLACK = (000,000,000)
-		self.organicolist = []
-		self.metallist = []
-		self.plasticolist = []
-		self.papellist = []
-		self.vidrolist = []
 		self.ponto = 0
 
 		self.cont = 0
@@ -49,25 +44,25 @@ class Game():
 		pygame.display.set_caption('Coleta Seletiva')
 		self.DISPLAYSURF = pygame.display.set_mode((700, 550))
 		# pygame.display.toggle_fullscreen()
-		self.playing = pygame.image.load('playing.png')
+		self.playing = pygame.image.load('data/images/background/playing.png')
 
-		self.menu = pygame.image.load('menu1.png')
+		self.menu = pygame.image.load('data/images/menu/menu1.png')
 
-		self.jogar = pygame.image.load('jogar1.png')
+		self.jogar = pygame.image.load('data/images/menu/jogar1.png')
 
-		self.sair = pygame.image.load('sair1.png')
+		self.sair = pygame.image.load('data/images/menu/sair1.png')
 
-		self.instrucoes = pygame.image.load('instrucoes1.png')
+		self.instrucoes = pygame.image.load('data/images/menu/instrucoes1.png')
 
-		self.organicoimg = pygame.image.load('organico.png')
+		self.organicoimg = pygame.image.load('data/images/trash/organico.png')
 
-		self.metalimg = pygame.image.load('metal.png')
+		self.metalimg = pygame.image.load('data/images/trash/metal.png')
 
-		self.vidroimg = pygame.image.load('vidro.png')
+		self.vidroimg = pygame.image.load('data/images/trash/vidro.png')
 
-		self.plasticoimg = pygame.image.load('Plastico.png')
+		self.plasticoimg = pygame.image.load('data/images/trash/plastico.png')
 
-		self.papelimg = pygame.image.load('papel.png')
+		self.papelimg = pygame.image.load('data/images/trash/papel.png')
 
 		self.menuObjRect = self.menu.get_rect()
 		self.menuObjRect.center = (600,60)
@@ -102,7 +97,7 @@ class Game():
 	def draw(self):
 		self.DISPLAYSURF.blit(self.playing,self.playingObjRect)
 		if self.instrucoesbool:
-			instrucoescaixa = pygame.image.load('instrucoescaixa.png')
+			instrucoescaixa = pygame.image.load('data/images/menu/instrucoescaixa.png')
 			instrucoescaixaObjRect = instrucoescaixa.get_rect()
 			instrucoescaixaObjRect.center = (350,275)
 			self.DISPLAYSURF.blit(self.menu,self.menuObjRect)
@@ -178,9 +173,9 @@ class Game():
 						exit()
 				
 			if self.sairObjRect.collidepoint(mouseMotPos):
-				self.sair = pygame.image.load('sair2.png')
+				self.sair = pygame.image.load('data/menu/sair2.png')
 			else:
-				self.sair = pygame.image.load('sair1.png')
+				self.sair = pygame.image.load('data/menu/sair1.png')
 			if self.sairObjRect.collidepoint(mouseMotPos):
 					if self.jogando:
 						self.jogando = False
@@ -192,35 +187,35 @@ class Game():
 						exit()
 			if self.jogando == False and self.instrucoesbool == False:
 				if self.menuObjRect.collidepoint(mouseMotPos):
-					self.menu = pygame.image.load('menu2.png')
+					self.menu = pygame.image.load('data/menu/menu2.png')
 				else:
-					self.menu = pygame.image.load('menu1.png')
+					self.menu = pygame.image.load('data/menu/menu1.png')
 				
 				if self.jogarObjRect.collidepoint(mouseMotPos):
-					self.jogar = pygame.image.load('jogar2.png')
+					self.jogar = pygame.image.load('data/menu/jogar2.png')
 				else:
-					self.jogar = pygame.image.load('jogar1.png')
+					self.jogar = pygame.image.load('data/menu/jogar1.png')
 				
 				if self.instrucoesObjRect.collidepoint(mouseMotPos):
-					self.instrucoes = pygame.image.load('instrucoes2.png')
+					self.instrucoes = pygame.image.load('data/menu/instrucoes2.png')
 				else:
-					self.instrucoes = pygame.image.load('instrucoes1.png')
+					self.instrucoes = pygame.image.load('data/menu/instrucoes1.png')
 					
 				if self.clicked:
 					if self.jogarObjRect.collidepoint(mouseClkPos):
 						self.jogando = True
-						soundObj = pygame.mixer.Sound('asdf.ogg')
+						soundObj = pygame.mixer.Sound('data/sounds/click.ogg')
 						soundObj.play()
 						
 					if self.instrucoesObjRect.collidepoint(mouseClkPos):
 						self.instrucoesbool = True	
-						soundObj = pygame.mixer.Sound('asdf.ogg')
+						soundObj = pygame.mixer.Sound('data/sounds/click.ogg')
 						soundObj.play()
 						
 				
 				if self.menuObjRect.collidepoint(mouseClkPos):
 					self.click = True
-					soundObj = pygame.mixer.Sound('asdf.ogg')
+					soundObj = pygame.mixer.Sound('data/sounds/click.ogg')
 					soundObj.play()
 					
 					
@@ -235,21 +230,21 @@ class Game():
 					self.instrucoesObjRect.center = (self.instrucoesx,self.instrucoesy)
 			
 			elif self.instrucoesbool == True:
-				instrucoescaixa = pygame.image.load('instrucoescaixa.png')
+				instrucoescaixa = pygame.image.load('data/images/menu/instrucoescaixa.png')
 				instrucoescaixaObjRect = instrucoescaixa.get_rect()
 				instrucoescaixaObjRect.center = (350,275)
 				self.DISPLAYSURF.blit(self.menu,self.menuObjRect)
 				self.DISPLAYSURF.blit(instrucoescaixa,instrucoescaixaObjRect)
 				if self.menuObjRect.collidepoint(mouseClkPos):
 					self.instrucoesbool = False
-					soundObj = pygame.mixer.Sound('asdf.ogg')
+					soundObj = pygame.mixer.Sound('data/sounds/click.ogg')
 					soundObj.play()
 					
 				
 				if self.menuObjRect.collidepoint(mouseMotPos):
-					self.menu = pygame.image.load('menu2.png')
+					self.menu = pygame.image.load('data/images/menu/menu2.png')
 				else:
-					self.menu = pygame.image.load('menu1.png')
+					self.menu = pygame.image.load('data/images/menu/menu1.png')
 					
 			elif self.jogando == True: #Eis o Real Jogo
 				
@@ -375,7 +370,7 @@ class Game():
 					time.sleep(3)
 					
 				if self.vidas == 0:
-					soundObj = pygame.mixer.Sound('badswap.wav')
+					soundObj = pygame.mixer.Sound('data/sounds/badswap.wav')
 					soundObj.play()
 					self.jogando = False
 					self.restart()
@@ -429,15 +424,15 @@ class Game():
 		self.ponto = 0
 
 	def acerto(self):
-		soundObj = pygame.mixer.Sound('match0.wav')
+		soundObj = pygame.mixer.Sound('data/sounds/match0.wav')
 		soundObj.play()
 		self.ponto +=1
-		self.playing = pygame.image.load('playing.png')
+		self.playing = pygame.image.load('data/images/background/playing.png')
 		self.clickagain = False
 
 	def erro(self):
 		self.vidas = self.vidas - 1
-		self.playing = pygame.image.load('playing2.png')
+		self.playing = pygame.image.load('data/images/background/playing2.png')
 		
 		self.clickagain = False
 
