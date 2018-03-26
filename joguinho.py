@@ -2,6 +2,7 @@ import random
 import sys
 import time
 from classes import Trash
+from constants import ORGANICO,METAL,PAPEL,VIDRO,PLASTICO,RED,BLACK
 
 import pygame
 from pygame.locals import QUIT,MOUSEBUTTONUP,MOUSEMOTION,KEYDOWN,K_ESCAPE
@@ -9,28 +10,23 @@ from pygame.locals import QUIT,MOUSEBUTTONUP,MOUSEMOTION,KEYDOWN,K_ESCAPE
 
 class Game():
 	def __init__(self, *args, **kwargs):
-		#consts :
-		#	COLORS
-		self.RED = (255,000,000)
-		self.GREEN = (000,255,000)
-		self.BLUE = (000,000,255)
-		self.WHITE = (255,255,255)
-		self.BLACK = (000,000,000)
-		# 	TYPES
-		self.ORGANICO = 0
-		self.METAL = 1
-		self.PAPEL = 2
-		self.PLASTICO = 3
-		self.VIDRO = 4
-
+		
 		self.ponto = 0
 
 		self.trashes = {
-			self.ORGANICO:Trash('data/images/trash/organico.png'),
-			self.METAL:Trash('data/images/trash/metal.png'),
-			self.PAPEL:Trash('data/images/trash/papel.png'),
-			self.PLASTICO:Trash('data/images/trash/plastico.png'),
-			self.VIDRO:Trash('data/images/trash/vidro.png')
+			ORGANICO:Trash('data/images/trash/organico.png'),
+			METAL:Trash('data/images/trash/metal.png'),
+			PAPEL:Trash('data/images/trash/papel.png'),
+			PLASTICO:Trash('data/images/trash/plastico.png'),
+			VIDRO:Trash('data/images/trash/vidro.png')
+		}
+
+		self.trashBins = {
+			ORGANICO:pygame.Rect(171,370,210-171,430-370),
+			METAL:pygame.Rect(86,370,126-86,430-126),
+			PAPEL:pygame.Rect(128,370,170-128,430-370),
+			PLASTICO:pygame.Rect(4,370,43-4,430-370),
+			VIDRO:pygame.Rect(45,370,90-45,430-370)
 		}
 
 		self.cont = 0
@@ -99,9 +95,6 @@ class Game():
 
 		self.restart()
 
-	def check_hover(self,mousePos,objRect):
-		return (mousePos[0] >= objRect.left and mousePos[0] <= objRect.right) and (mousePos[1] >= objRect.top and mousePos[1] <= objRect.bottom)
-
 	def draw(self):
 		self.DISPLAYSURF.blit(self.playing,self.playingObjRect)
 		if self.instrucoesbool:
@@ -111,23 +104,12 @@ class Game():
 			self.DISPLAYSURF.blit(self.menu,self.menuObjRect)
 			self.DISPLAYSURF.blit(instrucoescaixa,instrucoescaixaObjRect)
 		elif self.jogando:
-			if self.organico:
-				self.DISPLAYSURF.blit(*self.trashes[self.ORGANICO].get_draw_attr())
-
-			if self.plastico:
-				self.DISPLAYSURF.blit(*self.trashes[self.PLASTICO].get_draw_attr())
-
-			if self.metal:
-				self.DISPLAYSURF.blit(self.trashes[self.METAL].get_draw_attr())
-					
-			if self.vidro:
-				self.DISPLAYSURF.blit(self.vidroimg,self.vidroimgObjRect)
-					
-			if self.papel:
-				self.DISPLAYSURF.blit(self.papelimg,self.papelimgObjRect)
+			for i in self.trashes:
+				if i.in_screen:
+					i.draw(self.DISPLAYSURF)
 			
-			pontosObj = self.fontObj.render(str(self.ponto), True, self.BLACK)
-			vidasObj = self.fontObj.render(str(self.vidas), True, self.RED)
+			pontosObj = self.fontObj.render(str(self.ponto), True, BLACK)
+			vidasObj = self.fontObj.render(str(self.vidas), True, RED)
 			pontosObjRect = pontosObj.get_rect()
 			vidasObjRect = vidasObj.get_rect()
 			pontosObjRect.topright = (700,0)
@@ -136,20 +118,31 @@ class Game():
 			self.DISPLAYSURF.blit(vidasObj,vidasObjRect)
 
 			if self.ponto == 15:
-				textSurfaceObj = self.fontObj.render("Parabens, voce venceu", True, self.RED)
+				textSurfaceObj = self.fontObj.render("Parabens, voce venceu", True, RED)
 				textRectObj = textSurfaceObj.get_rect()
 				textRectObj.center = (350,275)
 				textRectObj.top = 0
 				self.DISPLAYSURF.blit(textSurfaceObj, textRectObj)
 			
 			if self.vidas == 0:
-				textSurfaceObj = self.fontObj.render("Game Over", True, self.RED)
+				textSurfaceObj = self.fontObj.render("Game Over", True, RED)
 				textRectObj = textSurfaceObj.get_rect()
 				textRectObj.center = (350,275)
 				textRectObj.top = 0
 				self.DISPLAYSURF.blit(textSurfaceObj, textRectObj)
+	
+	
+	def displayHud(self):
+		pontosObj = self.fontObj.render(str(self.ponto), True, BLACK)
+		vidasObj = self.fontObj.render(str(self.vidas), True, RED)
+		pontosObjRect = pontosObj.get_rect()
+		vidasObjRect = vidasObj.get_rect()
+		pontosObjRect.topright = (700,0)
+		vidasObjRect.topleft = (0,0)
+		self.DISPLAYSURF.blit(pontosObj,pontosObjRect)
+		self.DISPLAYSURF.blit(vidasObj,vidasObjRect)
 
-			
+
 	def main_loop(self):
 		while True: #main game loop
 			self.DISPLAYSURF.blit(self.playing,self.playingObjRect)
@@ -164,7 +157,7 @@ class Game():
 					mouseClkPos = event.pos
 					mousex,mousey = mouseClkPos
 					print mousex,mousey
-					if self.jogando and True in [self.plasticoclicked,self.metalclicked,self.papelclicked,self.organicoclicked,self.vidroclicked]:
+					if self.jogando and True in [ self.trashes[x].clicked for x in self.trashes.keys()]:
 						self.clickagain = True
 				if event.type ==  MOUSEMOTION:
 					mouseMotPos = event.pos
@@ -181,10 +174,10 @@ class Game():
 						exit()
 				
 			if self.sairObjRect.collidepoint(mouseMotPos):
-				self.sair = pygame.image.load('data/menu/sair2.png')
+				self.sair = pygame.image.load('data/images/menu/sair2.png')
 			else:
-				self.sair = pygame.image.load('data/menu/sair1.png')
-			if self.sairObjRect.collidepoint(mouseMotPos):
+				self.sair = pygame.image.load('data/images/menu/sair1.png')
+			if self.sairObjRect.collidepoint(mouseClkPos):
 					if self.jogando:
 						self.jogando = False
 					elif self.instrucoesbool:
@@ -195,19 +188,19 @@ class Game():
 						exit()
 			if self.jogando == False and self.instrucoesbool == False:
 				if self.menuObjRect.collidepoint(mouseMotPos):
-					self.menu = pygame.image.load('data/menu/menu2.png')
+					self.menu = pygame.image.load('data/images/menu/menu2.png')
 				else:
-					self.menu = pygame.image.load('data/menu/menu1.png')
+					self.menu = pygame.image.load('data/images/menu/menu1.png')
 				
 				if self.jogarObjRect.collidepoint(mouseMotPos):
-					self.jogar = pygame.image.load('data/menu/jogar2.png')
+					self.jogar = pygame.image.load('data/images/menu/jogar2.png')
 				else:
-					self.jogar = pygame.image.load('data/menu/jogar1.png')
+					self.jogar = pygame.image.load('data/images/menu/jogar1.png')
 				
 				if self.instrucoesObjRect.collidepoint(mouseMotPos):
-					self.instrucoes = pygame.image.load('data/menu/instrucoes2.png')
+					self.instrucoes = pygame.image.load('data/images/menu/instrucoes2.png')
 				else:
-					self.instrucoes = pygame.image.load('data/menu/instrucoes1.png')
+					self.instrucoes = pygame.image.load('data/images/menu/instrucoes1.png')
 					
 				if self.clicked:
 					if self.jogarObjRect.collidepoint(mouseClkPos):
@@ -257,111 +250,24 @@ class Game():
 			elif self.jogando == True: #Eis o Real Jogo
 				
 				if self.clickagain == True:
-					if self.plasticoclicked:	
-						if pygame.Rect(4,370,43-4,430-370).collidepoint(mouseClkPos):
-							self.acerto()
-							self.plastico = False
-							self.plasticoclicked = False
-						else:
-							self.erro()
-							self.plastico = False
-							self.plasticoclicked = False
-						
-					if self.organicoclicked:
-						if pygame.Rect(171,370,210-171,430-370).collidepoint(mouseClkPos):
-							self.organico = False
-							self.organicoclicked = False
-							self.acerto()
-						else:
-							self.organico = False
-							self.organicoclicked = False
-							self.erro()
-							
-					if self.metalclicked:
-						if pygame.Rect(86,370,126-86,430-126).collidepoint(mouseClkPos):
-							self.metal = False
-							self.metalclicked = False
-							self.acerto()
-						else:
-							self.metal = False
-							self.metalclicked = False
-							self.erro()
-							
-					if self.vidroclicked:
-						if pygame.Rect(45,370,90-45,430-370).collidepoint(mouseClkPos):
-							self.vidro = False
-							self.vidroclicked = False
-							self.acerto()
-						else:
-							self.vidro = False
-							self.vidroclicked = False
-							self.erro()
+					for i in self.trashes.keys():
+						if self.trashes[i].clicked:
+							if self.trashBins[i].collidepoint(mouseClkPos):
+								self.acerto()
+							else: 
+								self.erro()
+							self.trashes[i].clicked = self.trashes[i].in_screen = False
+
+
+				for i in self.trashes.keys():
+					if self.trashes[i].in_screen:
+						if self.trashes[i].clicked:
+							self.trashes[i].move_center(mouseMotPos)
+						self.trashes[i].draw(self.DISPLAYSURF)
+						if self.trashes[i].check_clicked(mouseClkPos):
+							break
 				
-					if self.organicoclicked:
-						if pygame.Rect(170,370,210-170,430-370).collidepoint(mouseClkPos):
-							self.organico = False
-							self.organicoclicked = False
-							self.acerto()
-						else:
-							self.organico = False
-							self.organicoclicked = False
-							self.erro()
-							
-					if self.papelclicked:
-						if pygame.Rect(128,370,170-128,430-370).collidepoint(mouseClkPos):
-							self.papel = False
-							self.papelclicked = False
-							self.acerto()
-							
-						else:
-							self.papel = False
-							self.papelclicked = False
-							self.erro()
-							
-				if self.organico:
-					self.DISPLAYSURF.blit(self.organicoimg,self.organicoimgObjRect)
-					if self.organicoimgObjRect.collidepoint(mouseClkPos):
-						self.organicoclicked = True
-						
-				if self.plastico:
-					self.DISPLAYSURF.blit(self.plasticoimg,self.plasticoimgObjRect)
-					if self.plasticoimgObjRect.collidepoint(mouseClkPos):
-						self.plasticoclicked = True
-						
-				if self.metal:
-					self.DISPLAYSURF.blit(self.metalimg,self.metalimgObjRect)
-					if self.metalimgObjRect.collidepoint(mouseClkPos):
-						self.metalclicked = True
-						
-				if self.vidro:
-					self.DISPLAYSURF.blit(self.vidroimg,self.vidroimgObjRect)
-					if self.vidroimgObjRect.collidepoint(mouseClkPos):
-						self.vidroclicked = True
-						
-				if self.papel:
-					self.DISPLAYSURF.blit(self.papelimg,self.papelimgObjRect)
-					if self.papelimgObjRect.collidepoint(mouseClkPos):
-						self.papelclicked = True
-						
-				if self.organicoclicked:
-					self.organicoimgObjRect.center = mouseMotPos
-				if self.plasticoclicked:
-					self.plasticoimgObjRect.center = mouseMotPos
-				if self.metalclicked:
-					self.metalimgObjRect.center = mouseMotPos
-				if self.papelclicked:
-					self.papelimgObjRect.center = mouseMotPos
-				if self.vidroclicked:
-					self.vidroimgObjRect.center = mouseMotPos
-				
-				pontosObj = self.fontObj.render(str(self.ponto), True, self.BLACK)
-				vidasObj = self.fontObj.render(str(self.vidas), True, self.RED)
-				pontosObjRect = pontosObj.get_rect()
-				vidasObjRect = vidasObj.get_rect()
-				pontosObjRect.topright = (700,0)
-				vidasObjRect.topleft = (0,0)
-				self.DISPLAYSURF.blit(pontosObj,pontosObjRect)
-				self.DISPLAYSURF.blit(vidasObj,vidasObjRect)
+				self.displayHud()
 				
 				if self.ponto == 15:
 					self.jogando = False
@@ -369,7 +275,7 @@ class Game():
 					mousey = 0
 					self.restart()
 					self.vidaponto()
-					textSurfaceObj = self.fontObj.render("Parabens, voce venceu", True, self.RED)
+					textSurfaceObj = self.fontObj.render("Parabens, voce venceu", True, RED)
 					textRectObj = textSurfaceObj.get_rect()
 					textRectObj.center = (350,275)
 					textRectObj.top = 0
@@ -383,7 +289,7 @@ class Game():
 					self.jogando = False
 					self.restart()
 					self.vidaponto()
-					textSurfaceObj = self.fontObj.render("Game Over", True, self.RED)
+					textSurfaceObj = self.fontObj.render("Game Over", True, RED)
 					textRectObj = textSurfaceObj.get_rect()
 					textRectObj.center = (350,275)
 					textRectObj.top = 0
@@ -391,19 +297,19 @@ class Game():
 					pygame.display.update()
 					time.sleep(3)
 				
-				if True not in [self.organico,self.plastico,self.metal,self.vidro,self.papel]:
+				if True not in [ self.trashes[x].in_screen for x in self.trashes.keys() ]:
 					#jogando = False
 					self.restart()
 					self.nivel += 1
 					nivelstr = "Nivel: "+str(self.nivel)
-					textSurfaceObj = self.fontObj.render(nivelstr, True, self.RED)
+					textSurfaceObj = self.fontObj.render(nivelstr, True, RED)
 					textRectObj = textSurfaceObj.get_rect()
 					self.contsol = self.cont
 					self.sol = True
 					
 				
 			if self.solObjRect.collidepoint(mouseClkPos):
-					textSurfaceObj = self.fontObj.render("CUIDADO, O SOL QUEIMA!!!", True, self.RED)
+					textSurfaceObj = self.fontObj.render("CUIDADO, O SOL QUEIMA!!!", True, RED)
 					textRectObj = textSurfaceObj.get_rect()
 					self.contsol = self.cont
 					self.sol = True
@@ -421,7 +327,6 @@ class Game():
 				self.DISPLAYSURF.blit(self.menu,self.menuObjRect)
 			
 			self.DISPLAYSURF.blit(self.sair,self.sairObjRect)
-			# self.draw()
 			pygame.display.update()
 			self.cont+= 1
 			self.fpsClock.tick(self.fps)
@@ -445,28 +350,14 @@ class Game():
 		self.clickagain = False
 
 	def restart(self):
-		self.organicoimgObjRect = self.organicoimg.get_rect()
-		self.organicoimgObjRect.center = (random.randint(40,600),random.randint(450,500))
-		self.metalimgObjRect = self.metalimg.get_rect()
-		self.metalimgObjRect.center = (random.randint(40,600),random.randint(450,500))
-		self.vidroimgObjRect = self.vidroimg.get_rect()
-		self.vidroimgObjRect.center = (random.randint(40,600),random.randint(450,500))
-		self.plasticoimgObjRect = self.plasticoimg.get_rect()
-		self.plasticoimgObjRect.center = (random.randint(40,600),random.randint(450,500))
-		self.papelimgObjRect = self.papelimg.get_rect()
-		self.papelimgObjRect.center = (random.randint(40,600),random.randint(450,500))
-		
-		
-		self.organico = True
-		self.organicoclicked = False
-		self.metal = True
-		self.metalclicked = False
-		self.papel = True
-		self.papelclicked = False
-		self.plastico = True
-		self.plasticoclicked = False
-		self.vidro = True
-		self.vidroclicked = False
+
+		for i in self.trashes.keys():
+			self.trashes[i].move_center((random.randint(40,600),random.randint(450,500)))
+			while self.trashes[i].rect.collidelist([ self.trashes[x].rect for x in self.trashes.keys()]):
+				print self.trashes[i].rect.collidelist([ self.trashes[x].rect for x in self.trashes.keys()])
+				self.trashes[i].move_center((random.randint(40,600),random.randint(450,500)))
+			self.trashes[i].in_screen = True
+			self.trashes[i].clicked = False
 
 
 game = Game()

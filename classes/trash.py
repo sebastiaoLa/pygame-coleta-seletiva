@@ -20,10 +20,16 @@ class Trash(object):
         elif pos == 'RIGHT':
             self.rect.right = coords
             
-    def get_draw_attr(self):
-        return self.img,self.rect
+    def move_center(self,pos):
+        self.rect.center = pos
+
+    def draw(self,surface):
+        surface.blit(self.img,self.rect)
     
-    def get_clicked(self,pos):
+    def check_collide_rect(self,rect):
+        return self.rect.colliderect(rect)
+
+    def check_clicked(self,pos):
         if self.rect.collidepoint(pos):
             self.clicked = True
             return True
