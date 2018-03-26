@@ -1,6 +1,7 @@
 import random
 import sys
 import time
+from classes import Trash
 
 import pygame
 from pygame.locals import QUIT,MOUSEBUTTONUP,MOUSEMOTION,KEYDOWN,K_ESCAPE
@@ -8,12 +9,29 @@ from pygame.locals import QUIT,MOUSEBUTTONUP,MOUSEMOTION,KEYDOWN,K_ESCAPE
 
 class Game():
 	def __init__(self, *args, **kwargs):
+		#consts :
+		#	COLORS
 		self.RED = (255,000,000)
 		self.GREEN = (000,255,000)
 		self.BLUE = (000,000,255)
 		self.WHITE = (255,255,255)
 		self.BLACK = (000,000,000)
+		# 	TYPES
+		self.ORGANICO = 0
+		self.METAL = 1
+		self.PAPEL = 2
+		self.PLASTICO = 3
+		self.VIDRO = 4
+
 		self.ponto = 0
+
+		self.trashes = {
+			self.ORGANICO:Trash('data/images/trash/organico.png'),
+			self.METAL:Trash('data/images/trash/metal.png'),
+			self.PAPEL:Trash('data/images/trash/papel.png'),
+			self.PLASTICO:Trash('data/images/trash/plastico.png'),
+			self.VIDRO:Trash('data/images/trash/vidro.png')
+		}
 
 		self.cont = 0
 		self.sol = False
@@ -53,16 +71,6 @@ class Game():
 		self.sair = pygame.image.load('data/images/menu/sair1.png')
 
 		self.instrucoes = pygame.image.load('data/images/menu/instrucoes1.png')
-
-		self.organicoimg = pygame.image.load('data/images/trash/organico.png')
-
-		self.metalimg = pygame.image.load('data/images/trash/metal.png')
-
-		self.vidroimg = pygame.image.load('data/images/trash/vidro.png')
-
-		self.plasticoimg = pygame.image.load('data/images/trash/plastico.png')
-
-		self.papelimg = pygame.image.load('data/images/trash/papel.png')
 
 		self.menuObjRect = self.menu.get_rect()
 		self.menuObjRect.center = (600,60)
@@ -104,13 +112,13 @@ class Game():
 			self.DISPLAYSURF.blit(instrucoescaixa,instrucoescaixaObjRect)
 		elif self.jogando:
 			if self.organico:
-				self.DISPLAYSURF.blit(self.organicoimg,self.organicoimgObjRect)
+				self.DISPLAYSURF.blit(*self.trashes[self.ORGANICO].get_draw_attr())
 
 			if self.plastico:
-				self.DISPLAYSURF.blit(self.plasticoimg,self.plasticoimgObjRect)
+				self.DISPLAYSURF.blit(*self.trashes[self.PLASTICO].get_draw_attr())
 
 			if self.metal:
-				self.DISPLAYSURF.blit(self.metalimg,self.metalimgObjRect)
+				self.DISPLAYSURF.blit(self.trashes[self.METAL].get_draw_attr())
 					
 			if self.vidro:
 				self.DISPLAYSURF.blit(self.vidroimg,self.vidroimgObjRect)
