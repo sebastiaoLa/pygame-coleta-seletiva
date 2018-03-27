@@ -3,6 +3,7 @@ import pygame
 class Trash(object):
     def __init__(self,imgPath):
         self.img = pygame.image.load(imgPath)
+        self.img = self.img.convert_alpha()
         self.rect = self.img.get_rect()
         self.type = type
         self.in_screen = True
