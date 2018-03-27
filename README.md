@@ -10,12 +10,12 @@ install python 2.7:
     linux: sudo apt-get install python
     windows: https://www.python.org/downloads/
 
-install requirements:
-    open termilan/prompt:
-        python -m pip install -r r.txt
+install requirements:  
+    open termilan/prompt:  
+        python -m pip install -r r.txt  
 
-        if fails:
-            pytohn -m pip install pygame pillow
+        if fails:  
+            pytohn -m pip install pygame pillow  
 
-open the game:
-    python joguinho.py
+open the game:  
+    python joguinho.py  
