@@ -26,10 +26,10 @@ class Game():
 
 		self.trashBins = {
 			ORGANICO:pygame.Rect(int(WIDTH*0.245),int(HEIGHT*0.68),int(WIDTH*0.055),int(HEIGHT*0.10)),
-			METAL:pygame.Rect(int(HEIGHT*0.167),int(HEIGHT*0.68),int(WIDTH*0.055),int(HEIGHT*0.10)),
-			PAPEL:pygame.Rect(int(HEIGHT*0.249),int(HEIGHT*0.68),int(WIDTH*0.055),int(HEIGHT*0.10)),
-			PLASTICO:pygame.Rect(int(HEIGHT*0.01),int(HEIGHT*0.68),int(WIDTH*0.055),int(HEIGHT*0.10)),
-			VIDRO:pygame.Rect(int(HEIGHT*0.089),int(HEIGHT*0.68),int(WIDTH*0.055),int(HEIGHT*0.10))
+			METAL:pygame.Rect(int(WIDTH*0.126),int(HEIGHT*0.68),int(WIDTH*0.055),int(HEIGHT*0.10)),
+			PAPEL:pygame.Rect(int(WIDTH*0.186),int(HEIGHT*0.68),int(WIDTH*0.055),int(HEIGHT*0.10)),
+			PLASTICO:pygame.Rect(int(WIDTH*0.0075),int(HEIGHT*0.68),int(WIDTH*0.055),int(HEIGHT*0.10)),
+			VIDRO:pygame.Rect(int(WIDTH*0.0674),int(HEIGHT*0.68),int(WIDTH*0.055),int(HEIGHT*0.10))
 		}
 
 		self.cont = 0
@@ -43,7 +43,7 @@ class Game():
 		self.mousemoy  = 0
 		self.jogary = 60
 		self.instrucoesy = 60
-		self.fps = 144
+		self.fps = 30
 		self.click = False
 		self.jogando = False
 		self.clicked = False
@@ -99,7 +99,7 @@ class Game():
 		vidasObj = self.fontObj.render(str(self.vidas), True, RED)
 		pontosObjRect = pontosObj.get_rect()
 		vidasObjRect = vidasObj.get_rect()
-		pontosObjRect.topright = (700,0)
+		pontosObjRect.topright = (WIDTH,0)
 		vidasObjRect.topleft = (0,0)
 		self.DISPLAYSURF.blit(pontosObj,pontosObjRect)
 		self.DISPLAYSURF.blit(vidasObj,vidasObjRect)
@@ -292,14 +292,14 @@ class Game():
 				self.DISPLAYSURF.blit(self.menu,self.menuObjRect)
 			
 			self.DISPLAYSURF.blit(self.sair,self.sairObjRect)
-			# self.DISPLAYSURF.fill(BROWN,self.trashBins[ORGANICO])
-			# self.DISPLAYSURF.fill(RED,self.trashBins[PLASTICO])
-			# self.DISPLAYSURF.fill(GREEN,self.trashBins[VIDRO])
-			# self.DISPLAYSURF.fill(BLUE,self.trashBins[PAPEL])
-			# self.DISPLAYSURF.fill(YELLOW,self.trashBins[METAL])
+			self.DISPLAYSURF.fill(BROWN,self.trashBins[ORGANICO])
+			self.DISPLAYSURF.fill(PINK,self.trashBins[PLASTICO])
+			self.DISPLAYSURF.fill(GREEN,self.trashBins[VIDRO])
+			self.DISPLAYSURF.fill(BLUE,self.trashBins[PAPEL])
+			self.DISPLAYSURF.fill(YELLOW,self.trashBins[METAL])
 			pygame.display.update()
 			self.cont+= 1
-			# self.fpsClock.tick(self.fps)
+			self.fpsClock.tick(self.fps)
 			print 'fps:',1000/((time.time()*1000)-millis)
 				
 
