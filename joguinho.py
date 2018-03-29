@@ -292,11 +292,11 @@ class Game():
 				self.DISPLAYSURF.blit(self.menu,self.menuObjRect)
 			
 			self.DISPLAYSURF.blit(self.sair,self.sairObjRect)
-			self.DISPLAYSURF.fill(BROWN,self.trashBins[ORGANICO])
-			self.DISPLAYSURF.fill(PINK,self.trashBins[PLASTICO])
-			self.DISPLAYSURF.fill(GREEN,self.trashBins[VIDRO])
-			self.DISPLAYSURF.fill(BLUE,self.trashBins[PAPEL])
-			self.DISPLAYSURF.fill(YELLOW,self.trashBins[METAL])
+			# self.DISPLAYSURF.fill(BROWN,self.trashBins[ORGANICO])
+			# self.DISPLAYSURF.fill(PINK,self.trashBins[PLASTICO])
+			# self.DISPLAYSURF.fill(GREEN,self.trashBins[VIDRO])
+			# self.DISPLAYSURF.fill(BLUE,self.trashBins[PAPEL])
+			# self.DISPLAYSURF.fill(YELLOW,self.trashBins[METAL])
 			pygame.display.update()
 			self.cont+= 1
 			self.fpsClock.tick(self.fps)
