@@ -9,6 +9,7 @@ class Trash(object):
         self.in_screen = True
         self.clicked = False
         self.batch = batch
+        self.moved = False
 
     def set_pos(self,pos,coords):
         if pos == 'CENTER':

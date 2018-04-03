@@ -34,11 +34,10 @@ class Game():
 			VIDRO:pygame.Rect(int(WIDTH*0.0674),int(HEIGHT*0.68),int(WIDTH*0.055),int(HEIGHT*0.10))
 		}
 
-		self.cont = 0
-		self.sol = False
+		self.timer = False
 		self.solObjRect = pygame.Rect(int(WIDTH*0.085),int( HEIGHT*0.013 ),int(WIDTH*0.09),int(HEIGHT*0.083))
 		self.nivel = 1
-		self.contsol = -1
+		self.temporizer = -1
 		self.mousex = 0
 		self.mousey = 0
 		self.mousemox = 0
@@ -94,7 +93,7 @@ class Game():
 
 		self.pontosObj = None
 		self.vidasObj = None
-
+		self.fps = None
 		self.restart()
 
 	
@@ -119,7 +118,7 @@ class Game():
 			else:
 				sys.exit()
 				pygame.quit()
-				exit()rue
+				exit()
 		if not self.jogando:
 			soundObj = pygame.mixer.Sound('data/sounds/click.ogg')
 			soundObj.play()
@@ -131,16 +130,16 @@ class Game():
 					self.instrucoes.clicked = True	
 
 				if self.menu.check_collide(mouseClkPos):
-					self.click = True
-			else::
+					self.animate = True
+			else:
 				if self.menu.check_collide(mouseClkPos):
 					self.instrucoes.clicked = False
 
 		elif self.jogando:	
 			if self.solObjRect.collidepoint(mouseClkPos):
 				self.textSurfaceObj.update("CUIDADO, O SOL QUEIMA!!!")
-				self.contsol = self.cont
-				self.sol = T
+				self.temporizer = time.time()+3
+				self.timer = T	
 			elif True in [ self.trashes[x].clicked for x in self.trashes.keys()]:
 				for i in self.trashes.keys():
 					if self.trashes[i].clicked:
@@ -148,8 +147,22 @@ class Game():
 							self.acerto()
 						else: 
 							self.erro()
+						
 						self.trashes[i].clicked = self.trashes[i].in_screen = False
+
 						break
+
+			for i in self.trashes:
+				if self.trashes[i].in_screen and self.trashes[i].check_clicked(mouseClkPos):
+					break
+
+			if True not in [ self.trashes[x].in_screen for x in self.trashes.keys() ]:
+				#jogando = False
+				self.restart()
+				self.nivel += 1
+				self.textSurfaceObj.update("Nivel: "+str(self.nivel))
+				self.temporizer = time.time()+3
+				self.timer = True
 
 		
 
@@ -221,12 +234,11 @@ class Game():
 				if self.jogar.get_center()['y'] >= 90:
 					self.animate = False
 				else:
-					self.jogar.move(0,int(HEIGHT*0.004))
-					self.instrucoes.move(0,int(HEIGHT*0.004)*2)
-
+					self.jogar.move(0,int(60.0/FPS))
+					self.instrucoes.move(0,int(60.0/FPS)*2)
+			
 			if eventHappen:
 				self.playing.draw(self.DISPLAYSURF)
-				
 				if self.instrucoes.clicked == True:
 					instrucoescaixa = Sprite(pygame.image.load('data/images/menu/instrucoescaixa.png'),self.batch)
 					instrucoescaixa.set_center((WIDTH/2,HEIGHT/2))
@@ -234,40 +246,38 @@ class Game():
 					self.menu.draw(self.DISPLAYSURF)
 						
 				elif self.jogando: 
+					self.displayHud()
 					for i in self.trashes.keys():
 						if self.trashes[i].in_screen:
 							self.trashes[i].draw(self.DISPLAYSURF)
 							
-					if True not in [ self.trashes[x].in_screen for x in self.trashes.keys() ]:
-						#jogando = False
-						self.restart()
-						self.nivel += 1
-						self.textSurfaceObj.update("Nivel: "+str(self.nivel))
-						self.contsol = self.cont
-						self.sol = True
-				
-				if self.sol==True:
-					if self.cont != self.contsol+3*self.fps:
-						self.textSurfaceObj.draw(self.DISPLAYSURF)
-					else:
-						self.sol = False
 				if self.jogando == False and self.instrucoes.clicked == False:
 					self.jogar.draw(self.DISPLAYSURF)
 					self.instrucoes.draw(self.DISPLAYSURF)
-					self.menu.draw(self.DISPLAYSURF)
-				
+					self.menu.draw(self.DISPLAYSURF)	
 				self.sair.draw(self.DISPLAYSURF)
-				self.batch.draw()
-			
+				
+			if self.timer==True:
+				if self.temporizer >= time.time():
+					self.textSurfaceObj.draw(self.DISPLAYSURF)
+				else:
+					self.playing.draw(self.DISPLAYSURF)
+					self.timer = False
 			# self.DISPLAYSURF.fill(BROWN,self.trashBins[ORGANICO])
 			# self.DISPLAYSURF.fill(PINK,self.trashBins[PLASTICO])
 			# self.DISPLAYSURF.fill(GREEN,self.trashBins[VIDRO])
 			# self.DISPLAYSURF.fill(BLUE,self.trashBins[PAPEL])
 			# self.DISPLAYSURF.fill(YELLOW,self.trashBins[METAL])
 			# self.batch.draw()
-			self.cont+= 1
-			self.fpsClock.tick(self.fps)
-			print 'fps:',1000/((time.time()*1000)-millis)
+			self.fpsClock.tick(FPS)
+			if not self.fps:
+				self.fps = Text(text='fps: %.2f' % (1000/((time.time()*1000)-millis)),batch=self.batch,size=12,background=WHITE)
+				self.fps.get_rect().bottomleft = (0,HEIGHT)
+			else:
+				self.fps.update('fps: %.2f' % (1000/((time.time()*1000)-millis)))
+			self.fps.draw(self.DISPLAYSURF)
+			self.batch.draw()
+			
 				
 
 	def vidaponto(self):
@@ -311,7 +321,6 @@ class Game():
 			test = True
 			while test:
 				self.trashes[i].move_center((random.randint(int(WIDTH*0.1),int(WIDTH*0.9)),random.randint(int(HEIGHT*0.85),int(HEIGHT*0.9))))
-				print self.trashes[i].rect.center
 				test = False
 				for j in self.trashes.keys():
 					if i != j:

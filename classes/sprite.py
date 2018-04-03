@@ -44,7 +44,7 @@ class Sprite(object):
             return self.rect.collidepoint(arg)
 
     
-class tempSprite(Sprite):
+class TempSprite(Sprite):
     def __init__(self, *args, **kwargs):
         Sprite.__init__(self)
         self.time = 0
