@@ -11,6 +11,7 @@ from constants import *
 
 class Game():
 	def __init__(self, *args, **kwargs):
+		self.animate = False
 		pygame.init()		
 		pygame.display.set_caption('Coleta Seletiva')
 		self.batch = Batch()
@@ -87,7 +88,7 @@ class Game():
 		self.instrucoes.draw(self.DISPLAYSURF)
 		self.sair.draw(self.DISPLAYSURF)
 
-		self.textSurfaceObj = Text(text="",color=RED)
+		self.textSurfaceObj = Text(text="",color=RED,batch=self.batch)
 		self.textSurfaceObj.set_center(WIDTH/2,HEIGHT/2)
 		self.textSurfaceObj.get_rect().top = 0
 
@@ -118,35 +119,73 @@ class Game():
 			else:
 				sys.exit()
 				pygame.quit()
-				exit()
-		if self.solObjRect.collidepoint(mouseClkPos):
-			self.textSurfaceObj.update("CUIDADO, O SOL QUEIMA!!!")
-			self.contsol = self.cont
-			self.sol = True
-		if self.jogando == False and self.instrucoes.clicked == False:					
-			if self.jogar.rect.collidepoint(mouseClkPos) and self.jogar.rect.center[1] >= 90:
-				self.jogando = True
-				soundObj = pygame.mixer.Sound('data/sounds/click.ogg')
-				soundObj.play()
-				
-			if self.instrucoes.rect.collidepoint(mouseClkPos) and self.jogar.rect.center[1] >= 90:
-				self.instrucoes.clicked = True	
-				soundObj = pygame.mixer.Sound('data/sounds/click.ogg')
-				soundObj.play()
+				exit()rue
+		if not self.jogando:
+			soundObj = pygame.mixer.Sound('data/sounds/click.ogg')
+			soundObj.play()
+			if self.instrucoes.clicked == False:						
+				if self.jogar.rect.collidepoint(mouseClkPos) and self.jogar.rect.center[1] >= 90:
+					self.jogando = True
 
-			if self.menu.check_collide(mouseClkPos):
+				if self.instrucoes.rect.collidepoint(mouseClkPos) and self.jogar.rect.center[1] >= 90:
+					self.instrucoes.clicked = True	
+
+				if self.menu.check_collide(mouseClkPos):
 					self.click = True
-					soundObj = pygame.mixer.Sound('data/sounds/click.ogg')
-					soundObj.play()
+			else::
+				if self.menu.check_collide(mouseClkPos):
+					self.instrucoes.clicked = False
 
+		elif self.jogando:	
+			if self.solObjRect.collidepoint(mouseClkPos):
+				self.textSurfaceObj.update("CUIDADO, O SOL QUEIMA!!!")
+				self.contsol = self.cont
+				self.sol = T
+			elif True in [ self.trashes[x].clicked for x in self.trashes.keys()]:
+				for i in self.trashes.keys():
+					if self.trashes[i].clicked:
+						if self.trashBins[i].collidepoint(mouseClkPos):
+							self.acerto()
+						else: 
+							self.erro()
+						self.trashes[i].clicked = self.trashes[i].in_screen = False
+						break
+
+		
+
+	def mouse_moved(self,mouseMotPos):
+		if self.instrucoes.clicked:
+			if self.menu.check_collide(mouseMotPos):
+				self.menu.surface = pygame.image.load('data/images/menu/menu2.png')
+			else:
+				self.menu.surface = pygame.image.load('data/images/menu/menu1.png')
+		if self.sair.check_collide(mouseMotPos):
+			self.sair.surface = pygame.image.load('data/images/menu/sair2.png')
+		else:
+			self.sair.surface = pygame.image.load('data/images/menu/sair1.png')
+		if self.jogando == False and self.instrucoes.clicked == False:
+			if self.menu.check_collide(mouseMotPos):
+				self.menu.surface = pygame.image.load('data/images/menu/menu2.png')
+			else:
+				self.menu.surface = pygame.image.load('data/images/menu/menu1.png')
 			
+			if self.jogar.rect.collidepoint(mouseMotPos):
+				self.jogar.surface = pygame.image.load('data/images/menu/jogar2.png')
+			else:
+				self.jogar.surface = pygame.image.load('data/images/menu/jogar1.png')
+			
+			if self.instrucoes.rect.collidepoint(mouseMotPos):
+				self.instrucoes.surface = pygame.image.load('data/images/menu/instrucoes2.png')
+			else:
+				self.instrucoes.surface = pygame.image.load('data/images/menu/instrucoes1.png')
 
 
 	def main_loop(self):
 		while True: #main game loop
 			millis = time.time()*1000
-			self.playing.draw(self.DISPLAYSURF)
+			eventHappen = False if not self.animate else True
 			for event in pygame.event.get():
+				eventHappen = True
 				mouseClkPos = (0,0)
 				mouseMotPos = (0,0)
 				if event.type == QUIT:
@@ -156,29 +195,9 @@ class Game():
 				if event.type == MOUSEBUTTONUP:
 					mouseClkPos = event.pos
 					self.game_clicked(mouseClkPos)
-					if self.jogando and True in [ self.trashes[x].clicked for x in self.trashes.keys()]:
-						self.clickagain = True
 				elif event.type ==  MOUSEMOTION:
 					mouseMotPos = event.pos
-					if self.sair.check_collide(mouseMotPos):
-						self.sair.surface = pygame.image.load('data/images/menu/sair2.png')
-					else:
-						self.sair.surface = pygame.image.load('data/images/menu/sair1.png')
-					if self.jogando == False and self.instrucoes.clicked == False:
-						if self.menu.check_collide(mouseMotPos):
-							self.menu.surface = pygame.image.load('data/images/menu/menu2.png')
-						else:
-							self.menu.surface = pygame.image.load('data/images/menu/menu1.png')
-						
-						if self.jogar.rect.collidepoint(mouseMotPos):
-							self.jogar.surface = pygame.image.load('data/images/menu/jogar2.png')
-						else:
-							self.jogar.surface = pygame.image.load('data/images/menu/jogar1.png')
-						
-						if self.instrucoes.rect.collidepoint(mouseMotPos):
-							self.instrucoes.surface = pygame.image.load('data/images/menu/instrucoes2.png')
-						else:
-							self.instrucoes.surface = pygame.image.load('data/images/menu/instrucoes1.png')
+					self.mouse_moved(mouseMotPos)
 					mousemox,mousemoy = mouseMotPos 
 				if event.type == KEYDOWN:
 					if event.key == K_f:
@@ -193,105 +212,89 @@ class Game():
 							pygame.quit()
 							exit()
 					
-
-			if self.jogar.get_center()['y'] >= 90:
-					self.click = False
-					self.clicked = True 
-				
-			if self.click == True:
-				self.jogar.move(0,int(HEIGHT*0.004))
-				self.instrucoes.move(0,int(HEIGHT*0.004)*2)
-
-			if self.instrucoes.clicked == True:
-				instrucoescaixa = Sprite(pygame.image.load('data/images/menu/instrucoescaixa.png'),self.batch)
-				instrucoescaixa.set_center((WIDTH/2,HEIGHT/2))
-				instrucoescaixa.draw(self.DISPLAYSURF)
-				self.menu.draw(self.DISPLAYSURF)
-				if self.menu.check_collide(mouseClkPos):
-					self.instrucoes.clicked = False
-					soundObj = pygame.mixer.Sound('data/sounds/click.ogg')
-					soundObj.play()
+			if eventHappen:
+				self.playing.draw(self.DISPLAYSURF)
+				if self.jogar.get_center()['y'] >= 90:
+						self.click = False
+						self.clicked = True 
+						self.animate = False
 					
-				
-				if self.menu.check_collide(mouseMotPos):
-					self.menu.surface = pygame.image.load('data/images/menu/menu2.png')
-				else:
-					self.menu.surface = pygame.image.load('data/images/menu/menu1.png')
+				if self.click == True:
+					self.animate = True
+					self.jogar.move(0,int(HEIGHT*0.004))
+					self.instrucoes.move(0,int(HEIGHT*0.004)*2)
+
+				if self.instrucoes.clicked == True:
+					instrucoescaixa = Sprite(pygame.image.load('data/images/menu/instrucoescaixa.png'),self.batch)
+					instrucoescaixa.set_center((WIDTH/2,HEIGHT/2))
+					instrucoescaixa.draw(self.DISPLAYSURF)
+					self.menu.draw(self.DISPLAYSURF)
 					
-			elif self.jogando: #Eis o Real Jogo
-				
-				if self.clickagain == True:
-					for i in self.trashes.keys():
-						if self.trashes[i].clicked:
-							if self.trashBins[i].collidepoint(mouseClkPos):
-								self.acerto()
-							else: 
-								self.erro()
-							self.trashes[i].clicked = self.trashes[i].in_screen = False
-
-				if self.clicked:
-					for i in self.trashes:
-						if self.trashes[i].in_screen:
-							self.trashes[i].check_clicked(mouseClkPos)
-
-
-				for i in self.trashes.keys():
-					if self.trashes[i].in_screen:
-						if self.trashes[i].clicked:
-							self.trashes[i].move_center(mouseMotPos)
-						self.trashes[i].draw(self.DISPLAYSURF)
+					
 						
-				
-				
-				if self.ponto == 15:
-					self.jogando = False
-					mousex = 0
-					mousey = 0
-					self.restart()
-					self.vidaponto()
-					self.textSurfaceObj.update("Parabens, voce venceu")
-					self.textSurfaceObj.draw()
-					self.batch.draw()
-					self.batch.draw()
-					time.sleep(3)
+				elif self.jogando: #Eis o Real Jogo
 					
-				if self.vidas == 0:
-					soundObj = pygame.mixer.Sound('data/sounds/badswap.wav')
-					soundObj.play()
-					self.jogando = False
-					self.restart()
-					self.vidaponto()
-					self.textSurfaceObj.update("Game Over")
-					self.textSurfaceObj.draw()
-					self.batch.draw()
-					time.sleep(3)
+					
+
+					
+					for i in self.trashes.keys():
+						if self.trashes[i].in_screen:
+							if self.trashes[i].clicked:
+								self.trashes[i].move_center(mouseMotPos)
+							self.trashes[i].draw(self.DISPLAYSURF)
+							
+					
+					
+					if self.ponto == 15:
+						self.jogando = False
+						mousex = 0
+						mousey = 0
+						self.restart()
+						self.vidaponto()
+						self.textSurfaceObj.update("Parabens, voce venceu")
+						self.textSurfaceObj.draw(self.DISPLAYSURF)
+						self.batch.draw()
+						self.batch.draw()
+						time.sleep(3)
+						
+					if self.vidas == 0:
+						soundObj = pygame.mixer.Sound('data/sounds/badswap.wav')
+						soundObj.play()
+						self.jogando = False
+						self.restart()
+						self.vidaponto()
+						self.textSurfaceObj.update("Game Over")
+						self.textSurfaceObj.draw(self.DISPLAYSURF)
+						self.batch.draw()
+						time.sleep(3)
+					
+					if True not in [ self.trashes[x].in_screen for x in self.trashes.keys() ]:
+						#jogando = False
+						self.restart()
+						self.nivel += 1
+						self.textSurfaceObj.update("Nivel: "+str(self.nivel))
+						self.contsol = self.cont
+						self.sol = True
 				
-				if True not in [ self.trashes[x].in_screen for x in self.trashes.keys() ]:
-					#jogando = False
-					self.restart()
-					self.nivel += 1
-					self.textSurfaceObj.update("Nivel: "+str(self.nivel))
-					self.contsol = self.cont
-					self.sol = True
+				if self.sol==True:
+					if self.cont != self.contsol+3*self.fps:
+						self.textSurfaceObj.draw(self.DISPLAYSURF)
+					else:
+						self.sol = False
+				if self.jogando == False and self.instrucoes.clicked == False:
+					self.jogar.draw(self.DISPLAYSURF)
+					self.instrucoes.draw(self.DISPLAYSURF)
+					self.menu.draw(self.DISPLAYSURF)
+				
+				self.sair.draw(self.DISPLAYSURF)
+				self.batch.draw()
 			
-			if self.sol==True:
-				if self.cont != self.contsol+3*self.fps:
-					self.textSurfaceObj.draw()
-				else:
-					self.sol = False
-			if self.jogando == False and self.instrucoes.clicked == False:
-				self.jogar.draw(self.DISPLAYSURF)
-				self.instrucoes.draw(self.DISPLAYSURF)
-				self.menu.draw(self.DISPLAYSURF)
-			
-			self.sair.draw(self.DISPLAYSURF)
 			# self.DISPLAYSURF.fill(BROWN,self.trashBins[ORGANICO])
 			# self.DISPLAYSURF.fill(PINK,self.trashBins[PLASTICO])
 			# self.DISPLAYSURF.fill(GREEN,self.trashBins[VIDRO])
 			# self.DISPLAYSURF.fill(BLUE,self.trashBins[PAPEL])
 			# self.DISPLAYSURF.fill(YELLOW,self.trashBins[METAL])
 			# self.batch.draw()
-			self.batch.draw()
 			self.cont+= 1
 			self.fpsClock.tick(self.fps)
 			print 'fps:',1000/((time.time()*1000)-millis)
@@ -306,14 +309,11 @@ class Game():
 		soundObj.play()
 		self.ponto +=1
 		self.playing.surface = pygame.image.fromstring(self.playingorgC.tobytes(),self.playingorgC.size,self.playingorgC.mode)
-		self.clickagain = False
 
 	def erro(self):
 		self.vidas = self.vidas - 1
 		
 		self.playing.surface = pygame.image.fromstring(self.playingorgE.tobytes(),self.playingorgE.size,self.playingorgE.mode)
-		
-		self.clickagain = False
 
 	def restart(self):
 
