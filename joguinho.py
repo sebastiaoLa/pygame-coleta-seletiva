@@ -178,6 +178,11 @@ class Game():
 				self.instrucoes.surface = pygame.image.load('data/images/menu/instrucoes2.png')
 			else:
 				self.instrucoes.surface = pygame.image.load('data/images/menu/instrucoes1.png')
+		elif self.jogando:
+			for i in self.trashes.keys():
+				if self.trashes[i].in_screen:
+					if self.trashes[i].clicked:
+						self.trashes[i].move_center(mouseMotPos)
 
 
 	def main_loop(self):
@@ -212,62 +217,27 @@ class Game():
 							pygame.quit()
 							exit()
 					
-			if eventHappen:
-				self.playing.draw(self.DISPLAYSURF)
+			if self.animate:
 				if self.jogar.get_center()['y'] >= 90:
-						self.click = False
-						self.clicked = True 
-						self.animate = False
-					
-				if self.click == True:
-					self.animate = True
+					self.animate = False
+				else:
 					self.jogar.move(0,int(HEIGHT*0.004))
 					self.instrucoes.move(0,int(HEIGHT*0.004)*2)
 
+			if eventHappen:
+				self.playing.draw(self.DISPLAYSURF)
+				
 				if self.instrucoes.clicked == True:
 					instrucoescaixa = Sprite(pygame.image.load('data/images/menu/instrucoescaixa.png'),self.batch)
 					instrucoescaixa.set_center((WIDTH/2,HEIGHT/2))
 					instrucoescaixa.draw(self.DISPLAYSURF)
 					self.menu.draw(self.DISPLAYSURF)
-					
-					
 						
-				elif self.jogando: #Eis o Real Jogo
-					
-					
-
-					
+				elif self.jogando: 
 					for i in self.trashes.keys():
 						if self.trashes[i].in_screen:
-							if self.trashes[i].clicked:
-								self.trashes[i].move_center(mouseMotPos)
 							self.trashes[i].draw(self.DISPLAYSURF)
 							
-					
-					
-					if self.ponto == 15:
-						self.jogando = False
-						mousex = 0
-						mousey = 0
-						self.restart()
-						self.vidaponto()
-						self.textSurfaceObj.update("Parabens, voce venceu")
-						self.textSurfaceObj.draw(self.DISPLAYSURF)
-						self.batch.draw()
-						self.batch.draw()
-						time.sleep(3)
-						
-					if self.vidas == 0:
-						soundObj = pygame.mixer.Sound('data/sounds/badswap.wav')
-						soundObj.play()
-						self.jogando = False
-						self.restart()
-						self.vidaponto()
-						self.textSurfaceObj.update("Game Over")
-						self.textSurfaceObj.draw(self.DISPLAYSURF)
-						self.batch.draw()
-						time.sleep(3)
-					
 					if True not in [ self.trashes[x].in_screen for x in self.trashes.keys() ]:
 						#jogando = False
 						self.restart()
@@ -309,11 +279,31 @@ class Game():
 		soundObj.play()
 		self.ponto +=1
 		self.playing.surface = pygame.image.fromstring(self.playingorgC.tobytes(),self.playingorgC.size,self.playingorgC.mode)
+		if self.ponto == 15:
+			self.jogando = False
+			mousex = 0
+			mousey = 0
+			self.restart()
+			self.vidaponto()
+			self.textSurfaceObj.update("Parabens, voce venceu")
+			self.textSurfaceObj.draw(self.DISPLAYSURF)
+			self.batch.draw()
+			time.sleep(3)
 
 	def erro(self):
 		self.vidas = self.vidas - 1
 		
 		self.playing.surface = pygame.image.fromstring(self.playingorgE.tobytes(),self.playingorgE.size,self.playingorgE.mode)
+		if self.vidas == 0:
+			soundObj = pygame.mixer.Sound('data/sounds/badswap.wav')
+			soundObj.play()
+			self.jogando = False
+			self.restart()
+			self.vidaponto()
+			self.textSurfaceObj.update("Game Over")
+			self.textSurfaceObj.draw(self.DISPLAYSURF)
+			self.batch.draw()
+			time.sleep(3)
 
 	def restart(self):
 
