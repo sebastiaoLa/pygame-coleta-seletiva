@@ -1,10 +1,10 @@
-from pygame import image,Surface
+from pygame import image,Surface,Rect
 from time import time
 
 
 class Sprite(object):
     
-    def __init__(self,img):
+    def __init__(self,img,batch = None):
         if isinstance(img,str):
             self.surface = image.load(img)    
         elif isinstance(img,Surface):
@@ -13,13 +13,20 @@ class Sprite(object):
             raise(TypeError('should be and path string or pygame.image.load obj'))
         self.rect = self.surface.get_rect()
         self.clicked = False
+        self.batch = batch
 
-    def set_center(self,pos):
-        self.rect.center = pos
+    def set_center(self,x,y=None):
+        if y:
+            self.rect.center = (x,y)
+        else:
+            self.rect.center = x
         return self
 
     def draw(self,disp):
-        disp.blit(self.surface,self.rect)
+        if self.batch:
+            self.batch.add_to_batch(disp.blit(self.surface,self.rect))
+        else:
+            disp.blit(self.surface,self.rect)
 
     def move(self,x,y):
         self.rect.center = (self.rect.center[0]+x,self.rect.center[1]+y)
@@ -29,6 +36,12 @@ class Sprite(object):
             'x':self.rect.center[0],
             'y':self.rect.center[1]
             }
+    
+    def check_collide(self,arg):
+        if isinstance(arg,Rect):
+            return self.rect.colliderect(arg)
+        else:
+            return self.rect.collidepoint(arg)
 
     
 class tempSprite(Sprite):
