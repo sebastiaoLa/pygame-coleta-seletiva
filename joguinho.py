@@ -1,3 +1,8 @@
+"""
+Mini game de reciclagem criado por @sebastiaoLa
+"""
+
+
 import random
 import sys
 import time
@@ -28,9 +33,15 @@ from constants import (
     FPS
 )
 
+def sair():
+    sys.exit()
+    pygame.quit()
+    exit()
 
 class Game(object):
+    """Classe principal com todos os elementos do jogo"""
     def __init__(self):
+        """Inicializa todas as variaveis"""
         self.animate = False
         pygame.init()
         pygame.display.set_caption('Coleta Seletiva')
@@ -185,7 +196,7 @@ class Game(object):
             elif self.instrucoes.clicked:
                 self.instrucoes.clicked = False
             else:
-                self.quit()
+                sair()
         if not self.jogando:
             sound_obj = pygame.mixer.Sound('data/sounds/click.ogg')
             sound_obj.play()
@@ -210,9 +221,9 @@ class Game(object):
                 self.temporizer = time.time()+3
                 self.timer = True
             elif True in [
-                    self.trashes[x].clicked for x in self.trashes.keys()
-                    ]:
-                for i in self.trashes.keys():
+                    self.trashes[x].clicked for x in self.trashes
+                ]:
+                for i in self.trashes:
                     if self.trashes[i].clicked:
                         if self.trash_bins[i].collidepoint(mouse_clk_pos):
                             self.acerto()
@@ -229,8 +240,8 @@ class Game(object):
                     break
 
             if True not in [
-                    self.trashes[x].in_screen for x in self.trashes.keys()
-                    ]:
+                    self.trashes[x].in_screen for x in self.trashes
+                ]:
                 # jogando = False
                 self.restart()
                 self.nivel += 1
@@ -238,61 +249,55 @@ class Game(object):
                 self.temporizer = time.time()+3
                 self.timer = True
 
-    def mouse_moved(self, mouseMotPos):
+    def mouse_moved(self, mouse_mot_pos):
         if self.instrucoes.clicked:
-            if self.menu.check_collide(mouseMotPos):
+            if self.menu.check_collide(mouse_mot_pos):
                 self.menu.surface = pygame.image.load(
                     'data/images/menu/menu2.png')
             else:
                 self.menu.surface = pygame.image.load(
                     'data/images/menu/menu1.png')
-        if self.sair.check_collide(mouseMotPos):
+        if self.sair.check_collide(mouse_mot_pos):
             self.sair.surface = pygame.image.load('data/images/menu/sair2.png')
         else:
             self.sair.surface = pygame.image.load('data/images/menu/sair1.png')
         if self.jogando is False and self.instrucoes.clicked is False:
-            if self.menu.check_collide(mouseMotPos):
-                self.menu.surface = pygame.image.load(
-                    'data/images/menu/menu2.png')
+            if self.menu.check_collide(mouse_mot_pos):
+                self.menu.surface = pygame.image.load('data/images/menu/menu2.png')
             else:
-                self.menu.surface = pygame.image.load(
-                    'data/images/menu/menu1.png')
+                self.menu.surface = pygame.image.load('data/images/menu/menu1.png')
 
-            if self.jogar.rect.collidepoint(mouseMotPos):
-                self.jogar.surface = pygame.image.load(
-                    'data/images/menu/jogar2.png')
+            if self.jogar.rect.collidepoint(mouse_mot_pos):
+                self.jogar.surface = pygame.image.load('data/images/menu/jogar2.png')
             else:
-                self.jogar.surface = pygame.image.load(
-                    'data/images/menu/jogar1.png')
+                self.jogar.surface = pygame.image.load('data/images/menu/jogar1.png')
 
-            if self.instrucoes.rect.collidepoint(mouseMotPos):
-                self.instrucoes.surface = pygame.image.load(
-                    'data/images/menu/instrucoes2.png')
+            if self.instrucoes.rect.collidepoint(mouse_mot_pos):
+                self.instrucoes.surface = pygame.image.load('data/images/menu/instrucoes2.png')
             else:
-                self.instrucoes.surface = pygame.image.load(
-                    'data/images/menu/instrucoes1.png')
+                self.instrucoes.surface = pygame.image.load('data/images/menu/instrucoes1.png')
         elif self.jogando:
-            for i in self.trashes.keys():
+            for i in self.trashes:
                 if self.trashes[i].in_screen:
                     if self.trashes[i].clicked:
-                        self.trashes[i].move_center(mouseMotPos)
+                        self.trashes[i].move_center(mouse_mot_pos)
 
     def main_loop(self):
         while True:  # main game loop
             millis = time.time()*1000
-            eventHappen = False if not self.animate else True
+            event_happen = False if not self.animate else True
             for event in pygame.event.get():
-                eventHappen = True
+                event_happen = True
                 mouse_clk_pos = (0, 0)
-                mouseMotPos = (0, 0)
+                mouse_mot_pos = (0, 0)
                 if event.type == QUIT:
-                    self.quit()
+                    sair()
                 if event.type == MOUSEBUTTONUP:
                     mouse_clk_pos = event.pos
                     self.game_clicked(mouse_clk_pos)
                 elif event.type == MOUSEMOTION:
-                    mouseMotPos = event.pos
-                    self.mouse_moved(mouseMotPos)
+                    mouse_mot_pos = event.pos
+                    self.mouse_moved(mouse_mot_pos)
                 if event.type == KEYDOWN:
                     if event.key == K_f:
                         pygame.display.toggle_fullscreen()
@@ -302,7 +307,7 @@ class Game(object):
                         elif self.instrucoes.clicked:
                             self.instrucoes.clicked = False
                         else:
-                            self.quit()
+                            sair()
 
             if self.animate:
                 if self.jogar.get_center()['y'] >= 90:
@@ -311,7 +316,7 @@ class Game(object):
                     self.jogar.move(0, int(60.0/FPS))
                     self.instrucoes.move(0, int(60.0/FPS)*2)
 
-            if eventHappen:
+            if event_happen:
                 self.playing.draw(self.displaysurf)
                 if self.instrucoes.clicked is True:
                     instrucoescaixa = Sprite(pygame.image.load(
@@ -322,7 +327,7 @@ class Game(object):
 
                 elif self.jogando:
                     self.display_hud()
-                    for i in self.trashes.keys():
+                    for i in self.trashes:
                         if self.trashes[i].in_screen:
                             self.trashes[i].draw(self.displaysurf)
 
@@ -401,8 +406,7 @@ class Game(object):
             time.sleep(3)
 
     def restart(self):
-
-        for i in self.trashes.keys():
+        for i in self.trashes:
             test = True
             while test:
                 self.trashes[i].move_center(
@@ -418,7 +422,7 @@ class Game(object):
                     )
                 )
                 test = False
-                for j in self.trashes.keys():
+                for j in self.trashes:
                     if i != j:
                         j_trash_rect = self.trashes[i].rect
                         i_trash_rect = self.trashes[j].rect
@@ -428,10 +432,7 @@ class Game(object):
             self.trashes[i].in_screen = True
             self.trashes[i].clicked = False
 
-    def quit(self):
-        sys.exit()
-        pygame.quit()
-        exit()
+    
 
-game = Game()
-game.main_loop()
+GAME = Game()
+GAME.main_loop()

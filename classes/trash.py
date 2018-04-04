@@ -1,7 +1,7 @@
 import pygame
 
 class Trash(object):
-    def __init__(self,imgPath,batch = None):
+    def __init__(self, imgPath, batch=None):
         self.img = pygame.image.load(imgPath)
         self.img = self.img.convert_alpha()
         self.rect = self.img.get_rect()
@@ -11,7 +11,7 @@ class Trash(object):
         self.batch = batch
         self.moved = False
 
-    def set_pos(self,pos,coords):
+    def set_pos(self, pos, coords):
         if pos == 'CENTER':
             self.rect.center = coords
         elif pos == 'LEFT':
@@ -22,20 +22,20 @@ class Trash(object):
             self.rect.bottom = coords
         elif pos == 'RIGHT':
             self.rect.right = coords
-            
-    def move_center(self,pos):
+
+    def move_center(self, pos):
         self.rect.center = pos
 
-    def draw(self,surface):
+    def draw(self, surface):
         if self.batch:
-            self.batch.add_to_batch(surface.blit(self.img,self.rect))
+            self.batch.add_to_batch(surface.blit(self.img, self.rect))
         else:
-            surface.blit(self.img,self.rect)
-    
-    def check_collide_rect(self,rect):
+            surface.blit(self.img, self.rect)
+
+    def check_collide_rect(self, rect):
         return self.rect.colliderect(rect)
 
-    def check_clicked(self,pos):
+    def check_clicked(self, pos):
         if self.rect.collidepoint(pos):
             self.clicked = True
             return True

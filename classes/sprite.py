@@ -1,63 +1,41 @@
-from pygame import image,Surface,Rect
-from time import time
+from pygame import image, Surface, Rect
 
 
 class Sprite(object):
-    
-    def __init__(self,img,batch = None):
-        if isinstance(img,str):
-            self.surface = image.load(img)    
-        elif isinstance(img,Surface):
+    def __init__(self, img, batch=None):
+        if isinstance(img, str):
+            self.surface = image.load(img)
+        elif isinstance(img, Surface):
             self.surface = img
         else:
-            raise(TypeError('should be and path string or pygame.image.load obj'))
+            raise TypeError('should be and path string or pygame.image.load obj')
         self.rect = self.surface.get_rect()
         self.clicked = False
         self.batch = batch
 
-    def set_center(self,x,y=None):
-        if y:
-            self.rect.center = (x,y)
+    def set_center(self, x_pos, y_pos=None):
+        if y_pos:
+            self.rect.center = (x_pos, y_pos)
         else:
-            self.rect.center = x
+            self.rect.center = x_pos
         return self
 
-    def draw(self,disp):
+    def draw(self, disp):
         if self.batch:
-            self.batch.add_to_batch(disp.blit(self.surface,self.rect))
+            self.batch.add_to_batch(disp.blit(self.surface, self.rect))
         else:
-            disp.blit(self.surface,self.rect)
+            disp.blit(self.surface, self.rect)
 
-    def move(self,x,y):
-        self.rect.center = (self.rect.center[0]+x,self.rect.center[1]+y)
+    def move(self, x_pos, y_pos):
+        self.rect.center = (self.rect.center[0]+x_pos, self.rect.center[1]+y_pos)
 
     def get_center(self):
         return {
             'x':self.rect.center[0],
             'y':self.rect.center[1]
             }
-    
-    def check_collide(self,arg):
-        if isinstance(arg,Rect):
+
+    def check_collide(self, arg):
+        if isinstance(arg, Rect):
             return self.rect.colliderect(arg)
-        else:
-            return self.rect.collidepoint(arg)
-
-    
-class TempSprite(Sprite):
-    def __init__(self, *args, **kwargs):
-        Sprite.__init__(self)
-        self.time = 0
-        self.count = 0
-
-    def set_time(self,time):
-        self.time = time
-    
-    def start_counter(self):
-        self.count = time()
-
-    def check_counter(self):
-        # returns when time is over
-        if self.count+self.time<time():
-            return True
-        return False
+        return self.rect.collidepoint(arg)
