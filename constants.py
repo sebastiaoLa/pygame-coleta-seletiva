@@ -19,11 +19,13 @@ PLASTICO = 3
 VIDRO = 4
 # SCREEN SIZE
 
-pygame.display.init()
-screen = pygame.display.Info()
-WIDTH = int(screen.current_w*0.9)
-HEIGHT = int(screen.current_h*0.9)
+# pygame.display.init()
+# screen = pygame.display.Info()
+# WIDTH = int(screen.current_w*0.9)
+# HEIGHT = int(screen.current_h*0.9)
 
 
-# WIDTH = 800
-# HEIGHT = 600
+WIDTH = 800
+HEIGHT = 600
+
+FPS = 30
