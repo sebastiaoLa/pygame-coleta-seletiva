@@ -33,7 +33,9 @@ class Game(object):
         pygame.display.set_caption('Coleta Seletiva')
         self.batch = Batch()
         self.displaysurf = pygame.display.set_mode(
-            (WIDTH, HEIGHT), pygame.HWSURFACE)  # |pygame.DOUBLEBUF)
+            (WIDTH, HEIGHT),
+            pygame.HWSURFACE # |pygame.DOUBLEBUF
+        )
         self.ponto = 0
 
         self.trashes = {
