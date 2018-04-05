@@ -2,41 +2,27 @@
 Mini game de reciclagem criado por @sebastiaoLa
 """
 
-
 import random
 import sys
 import time
 
-import pygame
-from PIL import Image
-from pygame.locals import (
-    K_ESCAPE,
-    KEYDOWN,
-    MOUSEBUTTONUP,
-    MOUSEMOTION,
-    QUIT,
-    K_f
-)
 
-from classes import Trash, Sprite, Batch, Text
-from constants import (
-    RED,
-    WIDTH,
-    WHITE,
-    BLACK,
-    ORGANICO,
-    PAPEL,
-    METAL,
-    PLASTICO,
-    VIDRO,
-    HEIGHT,
-    FPS
-)
+from PIL import Image
+import pygame
+from pygame.constants import (K_ESCAPE, KEYDOWN, MOUSEBUTTONUP, MOUSEMOTION,
+                              QUIT, K_f)
+
+from classes import Batch, Sprite, Text, Trash
+from constants import (BLACK, FPS, HEIGHT, METAL, ORGANICO, PAPEL, PLASTICO,
+                       RED, VIDRO, WHITE, WIDTH)
+
 
 def sair():
     sys.exit()
     pygame.quit()
     exit()
+
+GAME_CLOCK = pygame.time.Clock()
 
 class Game(object):
     """Classe principal com todos os elementos do jogo"""
@@ -284,8 +270,7 @@ class Game(object):
 
     def main_loop(self):
         while True:  # main game loop
-            millis = time.time()*1000
-            event_happen = False if not self.animate else True
+            event_happen = self.animate
             for event in pygame.event.get():
                 event_happen = True
                 mouse_clk_pos = (0, 0)
@@ -309,15 +294,16 @@ class Game(object):
                         else:
                             sair()
 
-            if self.animate:
-                if self.jogar.get_center()['y'] >= 90:
-                    self.animate = False
-                else:
-                    self.jogar.move(0, int(60.0/FPS))
-                    self.instrucoes.move(0, int(60.0/FPS)*2)
-
             if event_happen:
                 self.playing.draw(self.displaysurf)
+
+                if self.animate:
+                    if self.jogar.get_center()['y'] >= 90:
+                        self.animate = False
+                    else:
+                        self.jogar.move(0, int(60.0/FPS))
+                        self.instrucoes.move(0, int(60.0/FPS)*2)
+                
                 if self.instrucoes.clicked is True:
                     instrucoescaixa = Sprite(pygame.image.load(
                         'data/images/menu/instrucoescaixa.png'), self.batch)
@@ -349,18 +335,17 @@ class Game(object):
             # self.displaysurf.fill(BLUE,self.trash_bins[PAPEL])
             # self.displaysurf.fill(YELLOW,self.trash_bins[METAL])
             # self.batch.draw()
-            pygame.time.Clock().tick(FPS)
+            GAME_CLOCK.tick(FPS)
             if not self.fps:
                 self.fps = Text(
-                    text='fps: %.2f' % (1000/((time.time()*1000)-millis)),
+                    text='fps: %.2f' % (GAME_CLOCK.get_fps()),
                     batch=self.batch,
                     size=12,
                     background=WHITE
                 )
                 self.fps.get_rect().bottomleft = (0, HEIGHT)
             else:
-                self.fps.update('fps: %.2f' %
-                                (1000/((time.time()*1000)-millis)))
+                self.fps.update('fps: %.2f' % (GAME_CLOCK.get_fps()))
             self.fps.draw(self.displaysurf)
             self.batch.draw()
 
@@ -376,7 +361,7 @@ class Game(object):
             self.playing_orig_crt.tobytes(),
             self.playing_orig_crt.size,
             self.playing_orig_crt.mode
-        )
+        ).convert(self.displaysurf)
         if self.ponto == 15:
             self.jogando = False
             self.restart()
@@ -393,7 +378,7 @@ class Game(object):
             self.playing_orig_err.tobytes(),
             self.playing_orig_err.size,
             self.playing_orig_err.mode
-        )
+        ).convert(self.displaysurf)
         if self.vidas == 0:
             sound_obj = pygame.mixer.Sound('data/sounds/badswap.wav')
             sound_obj.play()
